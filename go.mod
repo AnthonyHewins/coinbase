@@ -1,3 +1,3 @@
-module github.com/preichenberger/go-coinbasepro/v2
+module github.com/AnthonyHewins/coinbase
 
 require github.com/gorilla/websocket v1.4.0

@@ -1,4 +1,4 @@
-package coinbasepro
+package coinbase
 
 type Error struct {
 	Message string `json:"message"`

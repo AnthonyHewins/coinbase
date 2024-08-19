@@ -1,20 +1,23 @@
-package coinbasepro
+package coinbase
 
 import (
 	"fmt"
+	"net/http"
 	"reflect"
 
 	ws "github.com/gorilla/websocket"
 )
 
+// deprecated
 func NewTestClient() *Client {
-	client := NewClient()
-	client.UpdateConfig(&ClientConfig{
-		BaseURL: "https://api-public.sandbox.pro.coinbase.com",
-	})
-	client.RetryCount = 2
-
-	return client
+	return &Client{
+		BaseURL:    DefaultSandboxURL,
+		Secret:     "",
+		Key:        "",
+		Passphrase: "",
+		HTTPClient: http.DefaultClient,
+		RetryCount: 0,
+	}
 }
 
 func NewTestWebsocketClient() (*ws.Conn, error) {

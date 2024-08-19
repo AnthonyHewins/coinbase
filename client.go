@@ -1,4 +1,4 @@
-package coinbasepro
+package coinbase
 
 import (
 	"bytes"
@@ -10,6 +10,9 @@ import (
 	"strconv"
 	"time"
 )
+
+const DefaultProdURL = "https://api.pro.coinbase.com"
+const DefaultSandboxURL = "https://api-public.sandbox.pro.coinbase.com"
 
 type Client struct {
 	BaseURL    string
@@ -27,54 +30,18 @@ type ClientConfig struct {
 	Secret     string
 }
 
-func NewClient() *Client {
-	baseURL := os.Getenv("COINBASE_PRO_BASEURL")
-	if baseURL == "" {
-		baseURL = "https://api.pro.coinbase.com"
-	}
-
-	client := Client{
+func NewClient(baseURL, key, passphrase, secret string, httpClient *http.Client) *Client {
+	return &Client{
 		BaseURL:    baseURL,
-		Key:        os.Getenv("COINBASE_PRO_KEY"),
-		Passphrase: os.Getenv("COINBASE_PRO_PASSPHRASE"),
-		Secret:     os.Getenv("COINBASE_PRO_SECRET"),
-		HTTPClient: &http.Client{
-			Timeout: 15 * time.Second,
-		},
+		Key:        key,
+		Passphrase: passphrase,
+		Secret:     secret,
+		HTTPClient: httpClient,
 		RetryCount: 0,
 	}
-
-	if os.Getenv("COINBASE_PRO_SANDBOX") == "1" {
-		client.UpdateConfig(&ClientConfig{
-			BaseURL: "https://api-public.sandbox.pro.coinbase.com",
-		})
-	}
-
-	return &client
 }
 
-func (c *Client) UpdateConfig(config *ClientConfig) {
-	baseURL := config.BaseURL
-	key := config.Key
-	passphrase := config.Passphrase
-	secret := config.Secret
-
-	if baseURL != "" {
-		c.BaseURL = baseURL
-	}
-	if key != "" {
-		c.Key = key
-	}
-	if passphrase != "" {
-		c.Passphrase = passphrase
-	}
-	if secret != "" {
-		c.Secret = secret
-	}
-}
-
-func (c *Client) Request(method string, url string,
-	params, result interface{}) (res *http.Response, err error) {
+func (c *Client) Request(method string, url string, params, result interface{}) (res *http.Response, err error) {
 	for i := 0; i < c.RetryCount+1; i++ {
 		retryDuration := time.Duration((math.Pow(2, float64(i))-1)/2*1000) * time.Millisecond
 		time.Sleep(retryDuration)
