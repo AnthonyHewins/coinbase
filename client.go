@@ -2,17 +2,19 @@ package coinbase
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"math"
 	"net/http"
-	"os"
 	"strconv"
 	"time"
 )
 
-const DefaultProdURL = "https://api.pro.coinbase.com"
-const DefaultSandboxURL = "https://api-public.sandbox.pro.coinbase.com"
+const DefaultProdURL = "https://api.coinbase.com/api/v3/brokerage"
+
+// const DefaultSandboxURL = "https://api-public.sandbox.pro.coinbase.com"
 
 type Client struct {
 	BaseURL    string
@@ -41,12 +43,12 @@ func NewClient(baseURL, key, passphrase, secret string, httpClient *http.Client)
 	}
 }
 
-func (c *Client) Request(method string, url string, params, result interface{}) (res *http.Response, err error) {
+func (c *Client) Request(ctx context.Context, method string, url string, params, result interface{}) (res *http.Response, err error) {
 	for i := 0; i < c.RetryCount+1; i++ {
 		retryDuration := time.Duration((math.Pow(2, float64(i))-1)/2*1000) * time.Millisecond
 		time.Sleep(retryDuration)
 
-		res, err = c.request(method, url, params, result)
+		res, err = c.request(ctx, method, url, params, result)
 		if res != nil && res.StatusCode == 429 {
 			continue
 		} else {
@@ -57,10 +59,10 @@ func (c *Client) Request(method string, url string, params, result interface{}) 
 	return res, err
 }
 
-func (c *Client) request(method string, url string,
+func (c *Client) request(ctx context.Context, method string, url string,
 	params, result interface{}) (res *http.Response, err error) {
 	var data []byte
-	body := bytes.NewReader(make([]byte, 0))
+	var body io.Reader
 
 	if params != nil {
 		data, err = json.Marshal(params)
@@ -79,21 +81,11 @@ func (c *Client) request(method string, url string,
 
 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
 
-	// XXX: Sandbox time is off right now
-	if os.Getenv("TEST_COINBASE_OFFSET") != "" {
-		inc, err := strconv.Atoi(os.Getenv("TEST_COINBASE_OFFSET"))
-		if err != nil {
-			return res, err
-		}
-
-		timestamp = strconv.FormatInt(time.Now().Unix()+int64(inc), 10)
-	}
-
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("User-Agent", "Go Coinbase Pro Client 1.0")
 
-	h, err := c.Headers(method, url, timestamp, string(data))
+	h, err := c.signature(method, url, timestamp, string(data))
 	if err != nil {
 		return res, err
 	}
@@ -109,14 +101,13 @@ func (c *Client) request(method string, url string,
 	defer res.Body.Close()
 
 	if res.StatusCode != 200 {
-		defer res.Body.Close()
 		coinbaseError := Error{}
 		decoder := json.NewDecoder(res.Body)
 		if err := decoder.Decode(&coinbaseError); err != nil {
 			return res, err
 		}
 
-		return res, error(coinbaseError)
+		return res, coinbaseError
 	}
 
 	if result != nil {
@@ -129,8 +120,7 @@ func (c *Client) request(method string, url string,
 	return res, nil
 }
 
-// Headers generates a map that can be used as headers to authenticate a request
-func (c *Client) Headers(method, url, timestamp, data string) (map[string]string, error) {
+func (c *Client) signature(method, url, timestamp, data string) (map[string]string, error) {
 	h := make(map[string]string)
 	h["CB-ACCESS-KEY"] = c.Key
 	h["CB-ACCESS-PASSPHRASE"] = c.Passphrase

@@ -1,6 +1,7 @@
 package coinbase
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -170,23 +171,23 @@ func (e *HistoricRate) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (c *Client) GetBook(product string, level int) (Book, error) {
+func (c *Client) GetBook(ctx context.Context, product string, level int) (Book, error) {
 	var book Book
 
 	requestURL := fmt.Sprintf("/products/%s/book?level=%d", product, level)
-	_, err := c.Request("GET", requestURL, nil, &book)
+	_, err := c.Request(ctx, "GET", requestURL, nil, &book)
 	return book, err
 }
 
-func (c *Client) GetTicker(product string) (Ticker, error) {
+func (c *Client) GetTicker(ctx context.Context, product string) (Ticker, error) {
 	var ticker Ticker
 
 	requestURL := fmt.Sprintf("/products/%s/ticker", product)
-	_, err := c.Request("GET", requestURL, nil, &ticker)
+	_, err := c.Request(ctx, "GET", requestURL, nil, &ticker)
 	return ticker, err
 }
 
-func (c *Client) ListTrades(product string,
+func (c *Client) ListTrades(ctx context.Context, product string,
 	p ...ListTradesParams) *Cursor {
 	paginationParams := PaginationParams{}
 	if len(p) > 0 {
@@ -197,15 +198,15 @@ func (c *Client) ListTrades(product string,
 		&paginationParams)
 }
 
-func (c *Client) GetProducts() ([]Product, error) {
+func (c *Client) GetProducts(ctx context.Context) ([]Product, error) {
 	var products []Product
 
 	requestURL := fmt.Sprintf("/products")
-	_, err := c.Request("GET", requestURL, nil, &products)
+	_, err := c.Request(ctx, "GET", requestURL, nil, &products)
 	return products, err
 }
 
-func (c *Client) GetHistoricRates(product string,
+func (c *Client) GetHistoricRates(ctx context.Context, product string,
 	p ...GetHistoricRatesParams) ([]HistoricRate, error) {
 	var historicRates []HistoricRate
 	requestURL := fmt.Sprintf("/products/%s/candles", product)
@@ -233,13 +234,13 @@ func (c *Client) GetHistoricRates(product string,
 		requestURL = fmt.Sprintf("%s?%s", requestURL, values.Encode())
 	}
 
-	_, err := c.Request("GET", requestURL, nil, &historicRates)
+	_, err := c.Request(ctx, "GET", requestURL, nil, &historicRates)
 	return historicRates, err
 }
 
-func (c *Client) GetStats(product string) (Stats, error) {
+func (c *Client) GetStats(ctx context.Context, product string) (Stats, error) {
 	var stats Stats
 	requestURL := fmt.Sprintf("/products/%s/stats", product)
-	_, err := c.Request("GET", requestURL, nil, &stats)
+	_, err := c.Request(ctx, "GET", requestURL, nil, &stats)
 	return stats, err
 }

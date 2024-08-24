@@ -1,0 +1,92 @@
+
+[TestLimitOrderFOKJSON - 1]
+{
+ "limit_limit_fok": {
+  "base_size": "1233",
+  "limit_price": "5436.23"
+ }
+}
+---
+
+[TestLimitOrderGTCJSON - 1]
+{
+ "limit_limit_gtc": {
+  "base_size": "214532",
+  "limit_price": "4325454",
+  "post_only": true
+ }
+}
+---
+
+[TestLimitOrderGTDJSON - 1]
+{
+ "limit_limit_gtd": {
+  "base_size": "213423.54",
+  "end_time": "0003-03-04T05:03:03Z",
+  "limit_price": "325343",
+  "post_only": true
+ }
+}
+---
+
+[TestLimitOrderIOCJson - 1]
+{
+ "sor_limit_ioc": {
+  "base_size": "19203",
+  "limit_price": "43254"
+ }
+}
+---
+
+[TestMarketOrderJSON - 1]
+{
+ "market_market_ioc": {
+  "base_size": "3423.5324",
+  "quote_size": "1234"
+ }
+}
+---
+
+[TestStopOrderGTCJSON - 1]
+{
+ "stop_limit_stop_limit_gtc": {
+  "base_size": "8210938.2398",
+  "limit_price": "821389",
+  "stop_direction": "STOP_DIRECTION_STOP_UP",
+  "stop_price": "1231"
+ }
+}
+---
+
+[TestStopOrderGTDJSON - 1]
+{
+ "stop_limit_stop_limit_gtd": {
+  "base_size": "8210938.2398",
+  "end_time": "0001-01-01T01:11:01Z",
+  "limit_price": "821389",
+  "stop_direction": "STOP_DIRECTION_STOP_UP",
+  "stop_price": "1231"
+ }
+}
+---
+
+[TestTriggerBracketOrderGTCJson - 1]
+{
+ "trigger_bracket_gtc": {
+  "base_size": "32425.43",
+  "limit_price": "3254.54",
+  "stop_trigger_price": "123.541"
+ }
+}
+---
+
+[TestTriggerBracketOrderGTDJson - 1]
+{
+ "trigger_bracket_gtd": {
+  "base_size": "32425.43",
+  "end_time": "0001-01-02T05:11:12Z",
+  "limit_price": "3254.54",
+  "stop_trigger_price": "123.541"
+ }
+}
+---

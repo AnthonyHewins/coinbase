@@ -1,6 +1,7 @@
 package coinbase
 
 import (
+	"context"
 	"fmt"
 )
 
@@ -49,18 +50,18 @@ type ListHoldsParams struct {
 }
 
 // Client Funcs
-func (c *Client) GetAccounts() ([]Account, error) {
+func (c *Client) GetAccounts(ctx context.Context) ([]Account, error) {
 	var accounts []Account
-	_, err := c.Request("GET", "/accounts", nil, &accounts)
+	_, err := c.Request(ctx, "GET", "/accounts", nil, &accounts)
 
 	return accounts, err
 }
 
-func (c *Client) GetAccount(id string) (Account, error) {
+func (c *Client) GetAccount(ctx context.Context, id string) (Account, error) {
 	account := Account{}
 
 	url := fmt.Sprintf("/accounts/%s", id)
-	_, err := c.Request("GET", url, nil, &account)
+	_, err := c.Request(ctx, "GET", url, nil, &account)
 	return account, err
 }
 

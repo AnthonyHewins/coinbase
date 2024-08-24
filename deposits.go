@@ -1,6 +1,7 @@
 package coinbase
 
 import (
+	"context"
 	"fmt"
 )
 
@@ -13,11 +14,11 @@ type Deposit struct {
 	PayoutAt Time   `json:"payout_at,string,omitempty"`
 }
 
-func (c *Client) CreateDeposit(newDeposit *Deposit) (Deposit, error) {
+func (c *Client) CreateDeposit(ctx context.Context, newDeposit *Deposit) (Deposit, error) {
 	var savedDeposit Deposit
 
 	url := fmt.Sprintf("/deposits/payment-method")
-	_, err := c.Request("POST", url, newDeposit, &savedDeposit)
+	_, err := c.Request(ctx, "POST", url, newDeposit, &savedDeposit)
 	return savedDeposit, err
 }
 
@@ -27,11 +28,11 @@ type PaymentMethod struct {
 	ID       string `json:"id"`
 }
 
-func (c *Client) GetPaymentMethods() ([]PaymentMethod, error) {
+func (c *Client) GetPaymentMethods(ctx context.Context) ([]PaymentMethod, error) {
 	var paymentMethods []PaymentMethod
 
 	url := fmt.Sprintf("/payment-methods")
-	_, err := c.Request("GET", url, nil, &paymentMethods)
+	_, err := c.Request(ctx, "GET", url, nil, &paymentMethods)
 
 	return paymentMethods, err
 }

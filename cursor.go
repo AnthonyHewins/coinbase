@@ -1,6 +1,7 @@
 package coinbase
 
 import (
+	"context"
 	"fmt"
 )
 
@@ -24,13 +25,13 @@ func NewCursor(client *Client, method, url string,
 	}
 }
 
-func (c *Cursor) Page(i interface{}, direction string) error {
+func (c *Cursor) Page(ctx context.Context, i interface{}, direction string) error {
 	url := c.URL
 	if c.Pagination.Encode(direction) != "" {
 		url = fmt.Sprintf("%s?%s", c.URL, c.Pagination.Encode(direction))
 	}
 
-	res, err := c.Client.Request(c.Method, url, c.Params, i)
+	res, err := c.Client.Request(ctx, c.Method, url, c.Params, i)
 	if err != nil {
 		c.HasMore = false
 		return err
@@ -46,10 +47,10 @@ func (c *Cursor) Page(i interface{}, direction string) error {
 	return nil
 }
 
-func (c *Cursor) NextPage(i interface{}) error {
-	return c.Page(i, "next")
+func (c *Cursor) NextPage(ctx context.Context, i interface{}) error {
+	return c.Page(ctx, i, "next")
 }
 
-func (c *Cursor) PrevPage(i interface{}) error {
-	return c.Page(i, "prev")
+func (c *Cursor) PrevPage(ctx context.Context, i interface{}) error {
+	return c.Page(ctx, i, "prev")
 }

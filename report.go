@@ -1,6 +1,7 @@
 package coinbase
 
 import (
+	"context"
 	"fmt"
 	"time"
 )
@@ -28,20 +29,20 @@ type Report struct {
 	EndDate     time.Time
 }
 
-func (c *Client) CreateReport(newReport *Report) (Report, error) {
+func (c *Client) CreateReport(ctx context.Context, newReport *Report) (Report, error) {
 	var savedReport Report
 
 	url := fmt.Sprintf("/reports")
-	_, err := c.Request("POST", url, newReport, &savedReport)
+	_, err := c.Request(ctx, "POST", url, newReport, &savedReport)
 
 	return savedReport, err
 }
 
-func (c *Client) GetReportStatus(id string) (Report, error) {
+func (c *Client) GetReportStatus(ctx context.Context, id string) (Report, error) {
 	report := Report{}
 
 	url := fmt.Sprintf("/reports/%s", id)
-	_, err := c.Request("GET", url, nil, &report)
+	_, err := c.Request(ctx, "GET", url, nil, &report)
 
 	return report, err
 }

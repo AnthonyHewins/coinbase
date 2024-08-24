@@ -1,6 +1,7 @@
 package coinbase
 
 import (
+	"context"
 	"fmt"
 )
 
@@ -10,10 +11,10 @@ type Currency struct {
 	MinSize string `json:"min_size"`
 }
 
-func (c *Client) GetCurrencies() ([]Currency, error) {
+func (c *Client) GetCurrencies(ctx context.Context) ([]Currency, error) {
 	var currencies []Currency
 
 	url := fmt.Sprintf("/currencies")
-	_, err := c.Request("GET", url, nil, &currencies)
+	_, err := c.Request(ctx, "GET", url, nil, &currencies)
 	return currencies, err
 }
