@@ -7,7 +7,7 @@ import (
 )
 
 // wrapper type to encapsulate JSON fields the end developer doesn't
-// need to worry about
+// need to worry about so the API is very clean
 type orderData struct {
 	QuoteSize        string     `json:"quote_size,omitempty"`
 	BaseSize         string     `json:"base_size,omitempty"`
@@ -143,26 +143,4 @@ func discoverConfig(orderType string, b json.RawMessage) (OrderConfig, error) {
 	}
 
 	return nil, fmt.Errorf("order config missing")
-}
-
-//go:generate enumer -type OrderType
-type OrderType byte
-
-const (
-	OrderTypeUnspecified OrderType = iota
-	Market
-	LimitIOC // Immediate or cancel (has to fill some part of the order immediately, if it fails, cancel the rest)
-	LimitFOK // Fill or Kill
-	LimitGTC // Good til Canceled
-	LimitGTD // Good til date
-	StopLimitGTC
-	StopLimitGTD
-	TriggerBracketGTC
-	TriggerBracketGTD
-)
-
-type OrderConfig interface {
-	json.Marshaler
-	json.Unmarshaler
-	OrderType() OrderType
 }

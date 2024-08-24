@@ -13,8 +13,6 @@ type Account struct {
 	Currency  string `json:"currency"`
 }
 
-// Ledger
-
 type LedgerEntry struct {
 	ID        string        `json:"id,number"`
 	CreatedAt Time          `json:"created_at,string"`
@@ -33,8 +31,6 @@ type LedgerDetails struct {
 type GetAccountLedgerParams struct {
 	Pagination PaginationParams
 }
-
-// Holds
 
 type Hold struct {
 	AccountID string `json:"account_id"`

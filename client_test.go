@@ -25,8 +25,8 @@ func newTestserver(status int, mock any) *testserver {
 
 	return &testserver{
 		c: &Client{
-			BaseURL:    s.URL,
-			HTTPClient: &http.Client{Timeout: time.Second * 4},
+			baseURL:    s.URL,
+			httpClient: &http.Client{Timeout: time.Second * 4},
 		},
 		server: s,
 	}
