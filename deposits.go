@@ -18,7 +18,7 @@ func (c *Client) CreateDeposit(ctx context.Context, newDeposit *Deposit) (Deposi
 	var savedDeposit Deposit
 
 	url := fmt.Sprintf("/deposits/payment-method")
-	_, err := c.Request(ctx, "POST", url, newDeposit, &savedDeposit)
+	_, err := c.request(ctx, "POST", url, newDeposit, &savedDeposit)
 	return savedDeposit, err
 }
 
@@ -32,7 +32,7 @@ func (c *Client) GetPaymentMethods(ctx context.Context) ([]PaymentMethod, error)
 	var paymentMethods []PaymentMethod
 
 	url := fmt.Sprintf("/payment-methods")
-	_, err := c.Request(ctx, "GET", url, nil, &paymentMethods)
+	_, err := c.request(ctx, "GET", url, nil, &paymentMethods)
 
 	return paymentMethods, err
 }

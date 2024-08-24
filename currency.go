@@ -15,6 +15,6 @@ func (c *Client) GetCurrencies(ctx context.Context) ([]Currency, error) {
 	var currencies []Currency
 
 	url := fmt.Sprintf("/currencies")
-	_, err := c.Request(ctx, "GET", url, nil, &currencies)
+	_, err := c.request(ctx, "GET", url, nil, &currencies)
 	return currencies, err
 }

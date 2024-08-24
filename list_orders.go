@@ -143,7 +143,7 @@ type ListOrdersResp struct {
 
 func (c *Client) ListOrders(ctx context.Context) (*ListOrdersResp, error) {
 	var r ListOrdersResp
-	_, err := c.Request(ctx, http.MethodGet, "/rders/historical/batch", nil, &r)
+	_, err := c.request(ctx, http.MethodGet, "/rders/historical/batch", nil, &r)
 	if err != nil {
 		return nil, err
 	}

@@ -33,7 +33,7 @@ func (c *Client) CancelOrders(ctx context.Context, ids ...string) error {
 	}
 
 	var r cancelWrapper
-	_, err := c.Request(ctx, "DELETE", "/orders/batch_cancel", map[string][]string{
+	_, err := c.request(ctx, "DELETE", "/orders/batch_cancel", map[string][]string{
 		"order_ids": ids,
 	}, &r)
 

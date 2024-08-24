@@ -10,14 +10,14 @@ import (
 
 type ServerTime struct {
 	ISO   string  `json:"iso"`
-	Epoch float64 `json:"epoch,number"`
+	Epoch float64 `json:"epoch"`
 }
 
 func (c *Client) GetTime(ctx context.Context) (ServerTime, error) {
 	var serverTime ServerTime
 
 	url := fmt.Sprintf("/time")
-	_, err := c.Request(ctx, "GET", url, nil, &serverTime)
+	_, err := c.request(ctx, "GET", url, nil, &serverTime)
 	return serverTime, err
 }
 

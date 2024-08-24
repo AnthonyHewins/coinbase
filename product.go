@@ -175,7 +175,7 @@ func (c *Client) GetBook(ctx context.Context, product string, level int) (Book, 
 	var book Book
 
 	requestURL := fmt.Sprintf("/products/%s/book?level=%d", product, level)
-	_, err := c.Request(ctx, "GET", requestURL, nil, &book)
+	_, err := c.request(ctx, "GET", requestURL, nil, &book)
 	return book, err
 }
 
@@ -183,7 +183,7 @@ func (c *Client) GetTicker(ctx context.Context, product string) (Ticker, error) 
 	var ticker Ticker
 
 	requestURL := fmt.Sprintf("/products/%s/ticker", product)
-	_, err := c.Request(ctx, "GET", requestURL, nil, &ticker)
+	_, err := c.request(ctx, "GET", requestURL, nil, &ticker)
 	return ticker, err
 }
 
@@ -202,7 +202,7 @@ func (c *Client) GetProducts(ctx context.Context) ([]Product, error) {
 	var products []Product
 
 	requestURL := fmt.Sprintf("/products")
-	_, err := c.Request(ctx, "GET", requestURL, nil, &products)
+	_, err := c.request(ctx, "GET", requestURL, nil, &products)
 	return products, err
 }
 
@@ -234,13 +234,13 @@ func (c *Client) GetHistoricRates(ctx context.Context, product string,
 		requestURL = fmt.Sprintf("%s?%s", requestURL, values.Encode())
 	}
 
-	_, err := c.Request(ctx, "GET", requestURL, nil, &historicRates)
+	_, err := c.request(ctx, "GET", requestURL, nil, &historicRates)
 	return historicRates, err
 }
 
 func (c *Client) GetStats(ctx context.Context, product string) (Stats, error) {
 	var stats Stats
 	requestURL := fmt.Sprintf("/products/%s/stats", product)
-	_, err := c.Request(ctx, "GET", requestURL, nil, &stats)
+	_, err := c.request(ctx, "GET", requestURL, nil, &stats)
 	return stats, err
 }

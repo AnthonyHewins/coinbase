@@ -15,6 +15,6 @@ func (c *Client) CreateTransfer(ctx context.Context, newTransfer *Transfer) (Tra
 	var savedTransfer Transfer
 
 	url := fmt.Sprintf("/transfers")
-	_, err := c.Request(ctx, "POST", url, newTransfer, &savedTransfer)
+	_, err := c.request(ctx, "POST", url, newTransfer, &savedTransfer)
 	return savedTransfer, err
 }

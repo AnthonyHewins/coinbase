@@ -15,6 +15,6 @@ func (c *Client) GetFees(ctx context.Context) (Fees, error) {
 	var fees Fees
 
 	url := fmt.Sprintf("/fees")
-	_, err := c.Request(ctx, "GET", url, nil, &fees)
+	_, err := c.request(ctx, "GET", url, nil, &fees)
 	return fees, err
 }
