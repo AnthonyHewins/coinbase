@@ -9,7 +9,13 @@ type triggerBracketGTCWrapper struct {
 }
 
 type TriggerBracketOrderGTC struct {
-	BaseSize   string `json:"base_size"`
+	// The amount of the first Asset in the Trading Pair. For example, on the
+	// BTC-USD Order Book, BTC is the Base Asset.
+	BaseSize string `json:"base_size"`
+
+	// The specified price, or better, that the Order should be executed at. A
+	// Buy Order will execute at or lower than the limit price. A Sell Order
+	// will execute at or higher than the limit price.
 	LimitPrice string `json:"limit_price"`
 
 	// The price level (in quote currency) where the position will be exited.

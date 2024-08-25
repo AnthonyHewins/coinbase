@@ -3,19 +3,21 @@ package coinbase
 import (
 	"context"
 	"fmt"
+
+	"github.com/google/uuid"
 )
 
 type Account struct {
-	ID        string `json:"id"`
-	Balance   string `json:"balance"`
-	Hold      string `json:"hold"`
-	Available string `json:"available"`
-	Currency  string `json:"currency"`
+	ID        uuid.UUID `json:"id"`
+	Balance   string    `json:"balance"`
+	Hold      string    `json:"hold"`
+	Available string    `json:"available"`
+	Currency  string    `json:"currency"`
 }
 
 type LedgerEntry struct {
-	ID        string        `json:"id,number"`
-	CreatedAt Time          `json:"created_at,string"`
+	ID        string        `json:"id"`
+	CreatedAt Time          `json:"created_at"`
 	Amount    string        `json:"amount"`
 	Balance   string        `json:"balance"`
 	Type      string        `json:"type"`
@@ -53,7 +55,7 @@ func (c *Client) GetAccounts(ctx context.Context) ([]Account, error) {
 	return accounts, err
 }
 
-func (c *Client) GetAccount(ctx context.Context, id string) (Account, error) {
+func (c *Client) GetAccount(ctx context.Context, id uuid.UUID) (Account, error) {
 	account := Account{}
 
 	url := fmt.Sprintf("/accounts/%s", id)

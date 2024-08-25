@@ -7,8 +7,13 @@ type marketOrderWrapper struct {
 }
 
 type MarketOrder struct {
+	// The amount of the second Asset in the Trading Pair. For example, on the
+	// BTC/USD Order Book, USD is the Quote Asset.
 	QuoteSize string
-	BaseSize  string
+
+	// The amount of the first Asset in the Trading Pair. For example, on the
+	// BTC-USD Order Book, BTC is the Base Asset.
+	BaseSize string
 }
 
 func (m *MarketOrder) OrderType() OrderType { return Market }

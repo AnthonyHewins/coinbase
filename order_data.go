@@ -9,8 +9,17 @@ import (
 // wrapper type to encapsulate JSON fields the end developer doesn't
 // need to worry about so the API is very clean
 type orderData struct {
-	QuoteSize        string     `json:"quote_size,omitempty"`
-	BaseSize         string     `json:"base_size,omitempty"`
+	// The amount of the second Asset in the Trading Pair. For example, on the
+	// BTC/USD Order Book, USD is the Quote Asset.
+	QuoteSize string `json:"quote_size,omitempty"`
+
+	// The amount of the first Asset in the Trading Pair. For example, on the
+	// BTC-USD Order Book, BTC is the Base Asset.
+	BaseSize string `json:"base_size,omitempty"`
+
+	// The specified price, or better, that the Order should be executed at. A
+	// Buy Order will execute at or lower than the limit price. A Sell Order
+	// will execute at or higher than the limit price.
 	LimitPrice       string     `json:"limit_price,omitempty"`
 	PostOnly         bool       `json:"post_only,omitempty"`
 	End              *time.Time `json:"end_time,omitempty"`
