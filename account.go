@@ -3,56 +3,58 @@ package coinbase
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 )
 
+//go:generate enumer -type AcctType -transform snake_upper
+type AcctType byte
+
+const (
+	AccountTypeUnspecified AcctType = iota
+	AccountTypeCrypto
+	AccountTypeFiat
+	AccountTypeVault
+	AccountTypePerpFutures
+)
+
+type Balance struct {
+	Value    string `json:"value"`
+	Currency string `json:"currency"`
+}
+
 type Account struct {
-	ID        uuid.UUID `json:"id"`
-	Balance   string    `json:"balance"`
-	Hold      string    `json:"hold"`
-	Available string    `json:"available"`
-	Currency  string    `json:"currency"`
-}
-
-type LedgerEntry struct {
-	ID        string        `json:"id"`
-	CreatedAt Time          `json:"created_at"`
-	Amount    string        `json:"amount"`
-	Balance   string        `json:"balance"`
-	Type      string        `json:"type"`
-	Details   LedgerDetails `json:"details"`
-}
-
-type LedgerDetails struct {
-	OrderID   string `json:"order_id"`
-	TradeID   string `json:"trade_id"`
-	ProductID string `json:"product_id"`
-}
-
-type GetAccountLedgerParams struct {
-	Pagination PaginationParams
-}
-
-type Hold struct {
-	AccountID string `json:"account_id"`
-	CreatedAt Time   `json:"created_at,string"`
-	UpdatedAt Time   `json:"updated_at,string"`
-	Amount    string `json:"amount"`
-	Type      string `json:"type"`
-	Ref       string `json:"ref"`
+	ID                uuid.UUID `json:"uuid"`
+	Name              string    `json:"name"`
+	Currency          string    `json:"currency"`
+	AvailableBalance  Balance   `json:"available_balance"`
+	Default           bool      `json:"default"`
+	Active            bool      `json:"active"`
+	Created           time.Time `json:"created_at"`
+	Updated           time.Time `json:"updated_at"`
+	Deleted           time.Time `json:"deleted_at"`
+	Type              AcctType  `json:"type"`
+	Ready             bool      `json:"ready"`
+	Hold              Balance   `json:"hold"`
+	RetailPortfolioID string    `json:"retail_portfolio_id"`
 }
 
 type ListHoldsParams struct {
 	Pagination PaginationParams
 }
 
-// Client Funcs
-func (c *Client) GetAccounts(ctx context.Context) ([]Account, error) {
-	var accounts []Account
-	_, err := c.request(ctx, "GET", "/accounts", nil, &accounts)
+func (c *Client) ListAccounts(ctx context.Context) ([]Account, error) {
+	type wrapper struct {
+		Accts   []Account `json:"accounts"`
+		HasNext bool      `json:"has_next"`
+		Cursor  string    `json:"cursor"`
+		Size    int32     `json:"size"`
+	}
 
-	return accounts, err
+	var accounts wrapper
+	_, err := c.request(ctx, "GET", "/accounts", nil, &accounts)
+	return accounts.Accts, err
 }
 
 func (c *Client) GetAccount(ctx context.Context, id uuid.UUID) (Account, error) {
@@ -61,25 +63,4 @@ func (c *Client) GetAccount(ctx context.Context, id uuid.UUID) (Account, error) 
 	url := fmt.Sprintf("/accounts/%s", id)
 	_, err := c.request(ctx, "GET", url, nil, &account)
 	return account, err
-}
-
-func (c *Client) ListAccountLedger(id string,
-	p ...GetAccountLedgerParams) *Cursor {
-	paginationParams := PaginationParams{}
-	if len(p) > 0 {
-		paginationParams = p[0].Pagination
-	}
-
-	return NewCursor(c, "GET", fmt.Sprintf("/accounts/%s/ledger", id),
-		&paginationParams)
-}
-
-func (c *Client) ListHolds(id string, p ...ListHoldsParams) *Cursor {
-	paginationParams := PaginationParams{}
-	if len(p) > 0 {
-		paginationParams = p[0].Pagination
-	}
-
-	return NewCursor(c, "GET", fmt.Sprintf("/accounts/%s/holds", id),
-		&paginationParams)
 }

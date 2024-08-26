@@ -11,7 +11,7 @@ import (
 
 const DefaultProdURL = "https://api.coinbase.com/api/v3/brokerage"
 
-// const DefaultSandboxURL = "https://api.sandbox.pro.coinbase.com"
+const DefaultSandboxURL = "https://api.sandbox.coinbase.com"
 
 type Client struct {
 	baseURL    string

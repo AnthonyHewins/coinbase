@@ -4,38 +4,28 @@ Go Coinbase Pro [![GoDoc](http://img.shields.io/badge/godoc-reference-blue.svg)]
 v3 [CoinBase Pro](https://pro.coinbase.com) API client fork
 
 - [Go Coinbase Pro ](#go-coinbase-pro-)
-    - [Older Go versions](#older-go-versions)
-  - [Documentation](#documentation)
-    - [Decimal management](#decimal-management)
-    - [Retry](#retry)
-    - [Examples](#examples)
-      - [Create order](#create-order)
+  - [Go get](#go-get)
+  - [Decimal management](#decimal-management)
+  - [Examples](#examples)
+    - [Create order](#create-order)
       - [Cancel order(s)](#cancel-orders)
       - [List orders](#list-orders)
     - [Websockets](#websockets)
 
-### Older Go versions
+## Go get
+
 ```sh
 go get github.com/AnthonyHewins/coinbase
 ```
 
-## Documentation
-For full details on functionality, see [GoDoc](http://godoc.org/github.com/preichenberger/go-coinbasepro) documentation.
-
-### Decimal management
+## Decimal management
 
 To manage precision correctly, this library sends all price values as strings for now.
 Considering building a decimal library directly into the codebase, but not sure which one
 
-### Retry
-You can set a retry count which uses exponential backoff: (2^(retry_attempt) - 1) / 2 * 1000 * milliseconds
-```
-client.RetryCount = 3 # 500ms, 1500ms, 3500ms
-```
+## Examples
 
-### Examples
-
-#### Create order
+### Create order
 
 All order types are available. To specify which one you want you need to pick
 an implementation of the `OrderConfig` interface:
