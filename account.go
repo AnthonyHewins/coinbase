@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 )
 
-//go:generate enumer -type AcctType -transform snake_upper
+//go:generate enumer -type AcctType -transform snake_upper -json
 type AcctType byte
 
 const (
@@ -49,14 +49,17 @@ func (c *Client) ListAccounts(ctx context.Context) ([]Account, error) {
 	}
 
 	var accounts wrapper
-	_, err := c.request(ctx, "GET", "/accounts?limit=250", nil, &accounts)
+	_, err := c.request(ctx, "GET", "/accounts", nil, &accounts)
 	return accounts.Accts, err
 }
 
 func (c *Client) GetAccount(ctx context.Context, id uuid.UUID) (*Account, error) {
-	account := Account{}
+	type wrapper struct {
+		Acct Account `json:"account"`
+	}
 
+	w := wrapper{}
 	url := fmt.Sprintf("/accounts/%s", id)
-	_, err := c.request(ctx, "GET", url, nil, &account)
-	return &account, err
+	_, err := c.request(ctx, "GET", url, nil, &w)
+	return &w.Acct, err
 }

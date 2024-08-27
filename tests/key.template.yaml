@@ -1,0 +1,7 @@
+# Fill this file out with the details, rename to key.yaml
+
+# the key name
+key: ""
+
+# the key secret. Should be an EC private key
+secret: ""

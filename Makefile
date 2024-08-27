@@ -8,6 +8,9 @@ test: ## Run go vet, and test the whole repo
 	go vet ./...
 	go test ./...
 
+integration-test: ## Run integration tests. Requires that you fill out tests/key.yaml (see tests/key.template.yaml). These hit prod (there is no sandbox), but every test doesn't involve using money
+	INTEGRATION=1 go test ./tests/...
+
 clean: gen ## tidy modules, delete the bin folder, go generate
 	go mod tidy
 

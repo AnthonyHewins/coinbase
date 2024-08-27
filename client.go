@@ -3,10 +3,14 @@ package coinbase
 import (
 	"bytes"
 	"context"
+	"crypto/ecdsa"
+	"crypto/x509"
 	"encoding/json"
+	"encoding/pem"
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 )
 
 const DefaultProdURL = "https://api.coinbase.com/api/v3/brokerage"
@@ -17,15 +21,45 @@ type Client struct {
 	baseURL    string
 	httpClient *http.Client
 
-	keyName, keySecret string
+	keyName string
+	key     *ecdsa.PrivateKey
 }
 
-func NewClient(baseURL, keySecret, keyName string, httpClient *http.Client) (*Client, error) {
+func parsePK(keySecret string) (*ecdsa.PrivateKey, error) {
+	block, _ := pem.Decode([]byte(keySecret))
+	if block == nil {
+		return nil, fmt.Errorf("could not decode coinbase's ECDSA private key (key length: %d)", len(keySecret))
+	}
+
+	key, err := x509.ParseECPrivateKey(block.Bytes)
+	if err != nil {
+		return nil, fmt.Errorf("failed parsing coinbase's x509 EC private key: %w", err)
+	}
+
+	return key, nil
+}
+
+func NewClient(baseURL, keyName, keySecret string, httpClient *http.Client) (*Client, error) {
+	key, err := parsePK(keySecret)
+	if err != nil {
+		return nil, err
+	}
+	return NewClientWithPrivateKey(baseURL, keyName, key, httpClient)
+}
+
+func NewClientWithPrivateKey(baseURL, keyName string, privateKey *ecdsa.PrivateKey, httpClient *http.Client) (*Client, error) {
 	switch {
 	case len(keyName) == 0:
-		return nil, fmt.Errorf("key name missing for coinbase client")
-	case len(keySecret) == 0:
-		return nil, fmt.Errorf("key secret not found for coinbase client")
+		return nil, fmt.Errorf("key name missing for coinbase client: empty string")
+	case privateKey == nil:
+		return nil, fmt.Errorf("private key missing for coinbase client")
+	}
+
+	keynameParts := strings.Split(keyName, "/")
+	if len(keynameParts) != 4 || keynameParts[0] != "organizations" || keynameParts[2] != "apiKeys" {
+		return nil, fmt.Errorf(
+			"keyname supplied is invalid: must follow the format organizations/{keyname}/apiKeys/{keyid}",
+		)
 	}
 
 	if httpClient == nil {
@@ -36,7 +70,7 @@ func NewClient(baseURL, keySecret, keyName string, httpClient *http.Client) (*Cl
 		baseURL:    baseURL,
 		httpClient: httpClient,
 		keyName:    keyName,
-		keySecret:  keySecret,
+		key:        privateKey,
 	}, nil
 }
 
@@ -73,20 +107,33 @@ func (c *Client) request(ctx context.Context, method string, url string, params,
 	}
 	defer res.Body.Close()
 
+	buf, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	switch res.StatusCode {
+	case 401:
+		return nil, fmt.Errorf("request was unauthorized (HTTP 401)")
+	case 200:
+		if result != nil {
+			err = json.Unmarshal(buf, result)
+		}
+
+		return res, err
+	}
+
 	if res.StatusCode != 200 {
 		coinbaseError := Error{}
-		decoder := json.NewDecoder(res.Body)
-		if err := decoder.Decode(&coinbaseError); err != nil {
-			return res, err
+		if err := json.Unmarshal(buf, &coinbaseError); err != nil {
+			return res, &UnmarshalErr{
+				Err:      err,
+				Buf:      string(buf),
+				RespCode: res.StatusCode,
+			}
 		}
 
 		return res, coinbaseError
-	}
-
-	if result != nil {
-		if err = json.NewDecoder(res.Body).Decode(result); err != nil {
-			return res, err
-		}
 	}
 
 	return res, nil

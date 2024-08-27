@@ -31,3 +31,13 @@ func (e Error) Error() string {
 
 	return sb.String()
 }
+
+type UnmarshalErr struct {
+	Err      error
+	Buf      string
+	RespCode int
+}
+
+func (u *UnmarshalErr) Error() string {
+	return u.Err.Error()
+}

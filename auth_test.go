@@ -6,12 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type mockNonce struct{}
-
-func (m mockNonce) Nonce() (string, error) {
-	return "", nil
-}
-
 func TestAuth(mainTest *testing.T) {
 	testCases := []struct {
 		name        string
@@ -20,13 +14,13 @@ func TestAuth(mainTest *testing.T) {
 	}{
 		{
 			name:        "base case",
-			expectedErr: "jwt: Could not decode private key (key length: 0)",
+			expectedErr: "jwt: invalid private key",
 		},
 		{
 			name: "works with mock key",
 			arg: Client{
-				keyName:   "name",
-				keySecret: mockPK,
+				keyName: "name",
+				key:     mockPK,
 			},
 		},
 	}
