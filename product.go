@@ -31,20 +31,20 @@ type Product struct {
 }
 
 type Ticker struct {
-	TradeID int          `json:"trade_id,number"`
-	Price   string       `json:"price"`
-	Size    string       `json:"size"`
-	Time    Time         `json:"time,string"`
-	Bid     string       `json:"bid"`
-	Ask     string       `json:"ask"`
-	Volume  StringNumber `json:"volume"`
+	TradeID int    `json:"trade_id"`
+	Price   string `json:"price"`
+	Size    string `json:"size"`
+	Time    Time   `json:"time"`
+	Bid     string `json:"bid"`
+	Ask     string `json:"ask"`
+	Volume  string `json:"volume"`
 }
 
 type Trade struct {
-	TradeID int    `json:"trade_id,number"`
+	TradeID int    `json:"trade_id"`
 	Price   string `json:"price"`
 	Size    string `json:"size"`
-	Time    Time   `json:"time,string"`
+	Time    Time   `json:"time"`
 	Side    string `json:"side"`
 }
 

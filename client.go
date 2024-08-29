@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strings"
 )
 
@@ -74,6 +75,25 @@ func NewClientWithPrivateKey(baseURL, keyName string, privateKey *ecdsa.PrivateK
 	}, nil
 }
 
+func (c *Client) get(ctx context.Context, url string, params url.Values, result any) error {
+	jwtStr, err := c.generateToken(http.MethodGet, url)
+	if err != nil {
+		return err
+	}
+
+	if len(params) > 0 {
+		url += "?" + params.Encode()
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.baseURL+url, nil)
+	if err != nil {
+		return err
+	}
+
+	_, err = c.send(req, jwtStr, result)
+	return err
+}
+
 func (c *Client) request(ctx context.Context, method string, url string, params, result interface{}) (res *http.Response, err error) {
 	jwtStr, err := c.generateToken(method, url)
 	if err != nil {
@@ -97,11 +117,15 @@ func (c *Client) request(ctx context.Context, method string, url string, params,
 		return res, err
 	}
 
+	return c.send(req, jwtStr, result)
+}
+
+func (c *Client) send(req *http.Request, jwtStr string, result any) (*http.Response, error) {
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Authorization", "Bearer "+jwtStr)
 
-	res, err = c.httpClient.Do(req)
+	res, err := c.httpClient.Do(req)
 	if err != nil {
 		return res, err
 	}

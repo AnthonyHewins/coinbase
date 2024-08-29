@@ -14,6 +14,7 @@ import (
 const keyFile = "key.yaml"
 
 var singleton config
+var riskyMode = false
 
 type config struct {
 	Key    string `yaml:"key"`
@@ -33,7 +34,12 @@ func TestMain(m *testing.M) {
 	if os.Getenv("INTEGRATION") == "" {
 		return
 	}
-	log.Println("$INTEGRATION set, running integration tests")
+
+	if riskyMode = os.Getenv("RISKY") != ""; riskyMode {
+		log.Println("$INTEGRATION set, running integration tests")
+	} else {
+		log.Println("$INTEGRATION set with $RISKY, running integration tests that involve more risky testing")
+	}
 
 	buf, err := os.ReadFile(keyFile)
 	if err != nil {

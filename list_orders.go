@@ -13,10 +13,10 @@ type EditHistory struct {
 	ReplaceAcceptTimestamp time.Time
 }
 
-type OrderResp struct {
+type Order struct {
 	ID                    string // Coinbase's ID
 	IdemKey               string // idempotency key you used to create it
-	Product               string
+	ProductID             string
 	User                  string
 	Config                OrderConfig
 	Side                  Side
@@ -49,7 +49,7 @@ type OrderResp struct {
 	RetailPortfolioID     string
 }
 
-func (o *OrderResp) UnmarshalJSON(b []byte) error {
+func (o *Order) UnmarshalJSON(b []byte) error {
 	type wrapper struct {
 		ID                    string            `json:"order_id"`
 		IdemKey               string            `json:"client_order_id"`
@@ -97,10 +97,10 @@ func (o *OrderResp) UnmarshalJSON(b []byte) error {
 		return err
 	}
 
-	*o = OrderResp{
+	*o = Order{
 		ID:                    x.ID,
 		IdemKey:               x.IdemKey,
-		Product:               x.Product,
+		ProductID:             x.Product,
 		User:                  x.User,
 		Config:                conf,
 		Side:                  x.Side,
@@ -137,13 +137,13 @@ func (o *OrderResp) UnmarshalJSON(b []byte) error {
 }
 
 type ListOrdersResp struct {
-	Orders  []Order
+	Orders  []CreateOrderArgs
 	HasNext bool
 }
 
 func (c *Client) ListOrders(ctx context.Context) (*ListOrdersResp, error) {
 	var r ListOrdersResp
-	_, err := c.request(ctx, http.MethodGet, "/rders/historical/batch", nil, &r)
+	_, err := c.request(ctx, http.MethodGet, "/orders/historical/batch", nil, &r)
 	if err != nil {
 		return nil, err
 	}

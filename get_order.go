@@ -11,10 +11,10 @@ type ListOrdersParams struct {
 	Pagination PaginationParams
 }
 
-func (c *Client) GetOrder(ctx context.Context, id string) (Order, error) {
+func (c *Client) GetOrder(ctx context.Context, id string) (*Order, error) {
 	var savedOrder Order
 
 	url := fmt.Sprintf("/orders/%s", id)
 	_, err := c.request(ctx, "GET", url, nil, &savedOrder)
-	return savedOrder, err
+	return &savedOrder, err
 }
