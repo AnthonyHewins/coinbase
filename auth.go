@@ -2,14 +2,11 @@ package coinbase
 
 import (
 	"crypto/rand"
-	"crypto/x509"
-	"encoding/pem"
 	"fmt"
 	"math"
 	"math/big"
 	"time"
 
-	"gopkg.in/go-jose/go-jose.v2"
 	"gopkg.in/go-jose/go-jose.v2/jwt"
 )
 
@@ -37,24 +34,6 @@ func (n nonceSource) Nonce() (string, error) {
 // generate a one-time use JWT. You actually need to create a new JWT per request;
 // this requires using the private key to sign a new token repeatedly
 func (c *Client) generateToken(method, path string) (string, error) {
-	block, _ := pem.Decode([]byte(c.keySecret))
-	if block == nil {
-		return "", fmt.Errorf("jwt: Could not decode private key")
-	}
-
-	key, err := x509.ParseECPrivateKey(block.Bytes)
-	if err != nil {
-		return "", fmt.Errorf("jwt: %w", err)
-	}
-
-	sig, err := jose.NewSigner(
-		jose.SigningKey{Algorithm: jose.ES256, Key: key},
-		(&jose.SignerOptions{NonceSource: nonceSource{}}).WithType("JWT").WithHeader("kid", c.keyName),
-	)
-	if err != nil {
-		return "", fmt.Errorf("jwt: %w", err)
-	}
-
 	cl := &claims{
 		Claims: &jwt.Claims{
 			Subject:   c.keyName,
@@ -64,7 +43,7 @@ func (c *Client) generateToken(method, path string) (string, error) {
 		},
 		URI: fmt.Sprintf("%s %s%s", method, hostSign, path),
 	}
-	jwtString, err := jwt.Signed(sig).Claims(cl).CompactSerialize()
+	jwtString, err := jwt.Signed(c.signer).Claims(cl).CompactSerialize()
 	if err != nil {
 		return "", fmt.Errorf("jwt: %w", err)
 	}

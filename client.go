@@ -11,6 +11,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"gopkg.in/go-jose/go-jose.v2"
 )
@@ -23,9 +24,8 @@ type Client struct {
 	baseURL    string
 	httpClient *http.Client
 
-	keyName    string
-	keySecret  string
-	privateKey *ecdsa.PrivateKey
+	keyName   string
+	keySecret string
 
 	signer jose.Signer
 }
@@ -45,15 +45,14 @@ func parsePK(keySecret string) (*ecdsa.PrivateKey, error) {
 }
 
 func NewClient(baseURL, keyName, keySecret string, httpClient *http.Client) (*Client, error) {
-	return &Client{
-		baseURL:    baseURL,
-		httpClient: httpClient,
-		keyName:    keyName,
-		keySecret:  keySecret,
-	}, nil
+	key, err := parsePK(keySecret)
+	if err != nil {
+		return nil, err
+	}
+
+	return NewClientWithPrivateKey(baseURL, keyName, key, httpClient)
 }
 
-/*
 func NewClientWithPrivateKey(baseURL, keyName string, privateKey *ecdsa.PrivateKey, httpClient *http.Client) (*Client, error) {
 	switch {
 	case len(keyName) == 0:
@@ -85,11 +84,9 @@ func NewClientWithPrivateKey(baseURL, keyName string, privateKey *ecdsa.PrivateK
 		baseURL:    baseURL,
 		httpClient: httpClient,
 		keyName:    keyName,
-		privateKey: privateKey,
 		signer:     sig,
 	}, nil
 }
-*/
 
 func (c *Client) get(ctx context.Context, url string, params url.Values, result any) error {
 	jwtStr, err := c.generateToken(http.MethodGet, url)
@@ -154,7 +151,7 @@ func (c *Client) send(req *http.Request, jwtStr string, result any) (*http.Respo
 
 	switch res.StatusCode {
 	case 401:
-		return nil, fmt.Errorf("request was unauthorized (HTTP 401)")
+		return nil, fmt.Errorf("request was unauthorized (HTTP 401). Ensure your IP is whitelisted")
 	case 200:
 		if result != nil {
 			err = json.Unmarshal(buf, result)
