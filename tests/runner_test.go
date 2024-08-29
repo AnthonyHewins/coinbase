@@ -36,9 +36,9 @@ func TestMain(m *testing.M) {
 	}
 
 	if riskyMode = os.Getenv("RISKY") != ""; riskyMode {
-		log.Println("$INTEGRATION set, running integration tests")
-	} else {
 		log.Println("$INTEGRATION set with $RISKY, running integration tests that involve more risky testing")
+	} else {
+		log.Println("$INTEGRATION set, running integration tests")
 	}
 
 	buf, err := os.ReadFile(keyFile)

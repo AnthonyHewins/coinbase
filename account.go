@@ -49,7 +49,7 @@ func (c *Client) ListAccounts(ctx context.Context) ([]Account, error) {
 	}
 
 	var accounts wrapper
-	_, err := c.request(ctx, "GET", "/accounts", nil, &accounts)
+	err := c.get(ctx, "/accounts", nil, &accounts)
 	return accounts.Accts, err
 }
 

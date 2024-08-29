@@ -11,7 +11,8 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"strings"
+
+	"gopkg.in/go-jose/go-jose.v2"
 )
 
 const DefaultProdURL = "https://api.coinbase.com/api/v3/brokerage"
@@ -22,8 +23,11 @@ type Client struct {
 	baseURL    string
 	httpClient *http.Client
 
-	keyName string
-	key     *ecdsa.PrivateKey
+	keyName    string
+	keySecret  string
+	privateKey *ecdsa.PrivateKey
+
+	signer jose.Signer
 }
 
 func parsePK(keySecret string) (*ecdsa.PrivateKey, error) {
@@ -41,13 +45,15 @@ func parsePK(keySecret string) (*ecdsa.PrivateKey, error) {
 }
 
 func NewClient(baseURL, keyName, keySecret string, httpClient *http.Client) (*Client, error) {
-	key, err := parsePK(keySecret)
-	if err != nil {
-		return nil, err
-	}
-	return NewClientWithPrivateKey(baseURL, keyName, key, httpClient)
+	return &Client{
+		baseURL:    baseURL,
+		httpClient: httpClient,
+		keyName:    keyName,
+		keySecret:  keySecret,
+	}, nil
 }
 
+/*
 func NewClientWithPrivateKey(baseURL, keyName string, privateKey *ecdsa.PrivateKey, httpClient *http.Client) (*Client, error) {
 	switch {
 	case len(keyName) == 0:
@@ -56,11 +62,19 @@ func NewClientWithPrivateKey(baseURL, keyName string, privateKey *ecdsa.PrivateK
 		return nil, fmt.Errorf("private key missing for coinbase client")
 	}
 
-	keynameParts := strings.Split(keyName, "/")
-	if len(keynameParts) != 4 || keynameParts[0] != "organizations" || keynameParts[2] != "apiKeys" {
+	if keynameParts := strings.Split(keyName, "/"); len(keynameParts) != 4 ||
+		keynameParts[0] != "organizations" || keynameParts[2] != "apiKeys" {
 		return nil, fmt.Errorf(
 			"keyname supplied is invalid: must follow the format organizations/{keyname}/apiKeys/{keyid}",
 		)
+	}
+
+	sig, err := jose.NewSigner(
+		jose.SigningKey{Algorithm: jose.ES256, Key: privateKey},
+		(&jose.SignerOptions{NonceSource: nonceSource{}}).WithType("JWT").WithHeader("kid", keyName),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed creating coinbase signer: %w", err)
 	}
 
 	if httpClient == nil {
@@ -71,9 +85,11 @@ func NewClientWithPrivateKey(baseURL, keyName string, privateKey *ecdsa.PrivateK
 		baseURL:    baseURL,
 		httpClient: httpClient,
 		keyName:    keyName,
-		key:        privateKey,
+		privateKey: privateKey,
+		signer:     sig,
 	}, nil
 }
+*/
 
 func (c *Client) get(ctx context.Context, url string, params url.Values, result any) error {
 	jwtStr, err := c.generateToken(http.MethodGet, url)
