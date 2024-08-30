@@ -8,11 +8,11 @@ import (
 	"strings"
 )
 
-const _TIFName = "UNKNOWNGOOD_UNTIL_DATE_TIMEGOOD_UNTIL_CANCELEDIMMEDIATE_OR_CANCELFILL_OR_KILL"
+const _TIFName = "UNKNOWNGOOD_UNTIL_DATE_TIMEGOOD_UNTIL_CANCELLEDIMMEDIATE_OR_CANCELFILL_OR_KILL"
 
-var _TIFIndex = [...]uint8{0, 7, 27, 46, 65, 77}
+var _TIFIndex = [...]uint8{0, 7, 27, 47, 66, 78}
 
-const _TIFLowerName = "unknowngood_until_date_timegood_until_canceledimmediate_or_cancelfill_or_kill"
+const _TIFLowerName = "unknowngood_until_date_timegood_until_cancelledimmediate_or_cancelfill_or_kill"
 
 func (i TIF) String() string {
 	if i >= TIF(len(_TIFIndex)-1) {
@@ -27,32 +27,32 @@ func _TIFNoOp() {
 	var x [1]struct{}
 	_ = x[TIFUnknown-(0)]
 	_ = x[TIFGoodUntilDateTime-(1)]
-	_ = x[TIFGoodUntilCanceled-(2)]
+	_ = x[TIFGoodUntilCancelled-(2)]
 	_ = x[TIFImmediateOrCancel-(3)]
 	_ = x[TIFFillOrKill-(4)]
 }
 
-var _TIFValues = []TIF{TIFUnknown, TIFGoodUntilDateTime, TIFGoodUntilCanceled, TIFImmediateOrCancel, TIFFillOrKill}
+var _TIFValues = []TIF{TIFUnknown, TIFGoodUntilDateTime, TIFGoodUntilCancelled, TIFImmediateOrCancel, TIFFillOrKill}
 
 var _TIFNameToValueMap = map[string]TIF{
 	_TIFName[0:7]:        TIFUnknown,
 	_TIFLowerName[0:7]:   TIFUnknown,
 	_TIFName[7:27]:       TIFGoodUntilDateTime,
 	_TIFLowerName[7:27]:  TIFGoodUntilDateTime,
-	_TIFName[27:46]:      TIFGoodUntilCanceled,
-	_TIFLowerName[27:46]: TIFGoodUntilCanceled,
-	_TIFName[46:65]:      TIFImmediateOrCancel,
-	_TIFLowerName[46:65]: TIFImmediateOrCancel,
-	_TIFName[65:77]:      TIFFillOrKill,
-	_TIFLowerName[65:77]: TIFFillOrKill,
+	_TIFName[27:47]:      TIFGoodUntilCancelled,
+	_TIFLowerName[27:47]: TIFGoodUntilCancelled,
+	_TIFName[47:66]:      TIFImmediateOrCancel,
+	_TIFLowerName[47:66]: TIFImmediateOrCancel,
+	_TIFName[66:78]:      TIFFillOrKill,
+	_TIFLowerName[66:78]: TIFFillOrKill,
 }
 
 var _TIFNames = []string{
 	_TIFName[0:7],
 	_TIFName[7:27],
-	_TIFName[27:46],
-	_TIFName[46:65],
-	_TIFName[65:77],
+	_TIFName[27:47],
+	_TIFName[47:66],
+	_TIFName[66:78],
 }
 
 // TIFString retrieves an enum value from the enum constants string name.

@@ -59,7 +59,7 @@ func discoverConfig(orderType string, b json.RawMessage) (OrderConfig, error) {
 
 	var m map[string]json.RawMessage
 	if err := json.Unmarshal(b, &m); err != nil {
-		return nil, fmt.Errorf("invalid limit order config: %w", err)
+		return nil, fmt.Errorf("invalid order config, expected object (%w): %s", err, b)
 	}
 
 	var data orderData

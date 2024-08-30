@@ -3,6 +3,8 @@ package coinbase
 import (
 	"context"
 	"fmt"
+
+	"github.com/google/uuid"
 )
 
 type ListOrdersParams struct {
@@ -11,10 +13,13 @@ type ListOrdersParams struct {
 	Pagination PaginationParams
 }
 
-func (c *Client) GetOrder(ctx context.Context, id string) (Order, error) {
-	var savedOrder Order
+func (c *Client) GetOrder(ctx context.Context, id uuid.UUID) (*Order, error) {
+	type wrapper struct {
+		Order Order `json:"order"`
+	}
 
-	url := fmt.Sprintf("/orders/%s", id)
-	_, err := c.request(ctx, "GET", url, nil, &savedOrder)
-	return savedOrder, err
+	var w wrapper
+	url := fmt.Sprintf("/orders/historical/%s", id)
+	_, err := c.request(ctx, "GET", url, nil, &w)
+	return &w.Order, err
 }

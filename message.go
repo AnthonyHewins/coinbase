@@ -1,5 +1,6 @@
 package coinbase
 
+/*
 import (
 	"encoding/json"
 )
@@ -91,3 +92,5 @@ func (e *SnapshotChange) UnmarshalJSON(data []byte) error {
 
 	return nil
 }
+
+*/
