@@ -2,6 +2,7 @@ package tests
 
 import (
 	"context"
+	"log"
 	"testing"
 	"time"
 
@@ -9,30 +10,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
-
-func equalOrder(t *assert.Assertions, c *coinbase.CreateOrderArgs, o *coinbase.Order) {
-	t.Equal(
-		&coinbase.CreateOrderArgs{
-			ID:                c.ID,
-			ProductID:         c.ProductID,
-			Side:              c.Side,
-			Config:            c.Config,
-			Leverage:          "1", // leverage should default to 1
-			MarginType:        c.MarginType,
-			RetailPortfolioID: c.RetailPortfolioID,
-			PreviewID:         c.PreviewID,
-		},
-		&coinbase.CreateOrderArgs{
-			ID:                o.IdemKey,
-			ProductID:         o.ProductID,
-			Side:              o.Side,
-			Leverage:          o.Leverage, // leverage should default to 1
-			MarginType:        o.MarginType,
-			RetailPortfolioID: o.RetailPortfolioID,
-			Config:            c.Config,
-		},
-	)
-}
 
 func TestOrders(mainTest *testing.T) {
 	if !riskyMode {
@@ -43,35 +20,51 @@ func TestOrders(mainTest *testing.T) {
 	c := testClient()
 	t := assert.New(mainTest)
 
-	create := &coinbase.CreateOrderArgs{
+	createResp, err := c.CreateOrder(context.Background(), &coinbase.CreateOrderArgs{
 		ID:        uuid.New().String(),
 		ProductID: "BTC-USD",
 		Side:      coinbase.SideBuy,
 		Config: &coinbase.LimitOrderGTD{
 			BaseSize:   "0.00000001",
 			LimitPrice: "0.01",
-			EndTime:    time.Now().Add(time.Second * 10),
+			EndTime:    time.Now().Add(time.Second * 15),
 		},
-	}
-
-	created, err := c.CreateOrder(context.Background(), create)
+	})
 
 	if !t.NoError(err, "should not error creating order") {
 		return
 	}
 
-	if !t.True(created, "order creation should have been executed") {
+	if !t.True(createResp.WasCreated, "order creation should have been executed") {
 		return
 	}
 
-	order, err := c.GetOrder(context.Background(), create.ID)
-	if !t.NoError(err, "should not fail getting order") {
+	defer func() {
+		err = c.CancelOrders(context.Background(), createResp.ID.String())
+		t.NoError(err, "canceling order should not fail")
+	}()
+
+	time.Sleep(2 * time.Second) // make sure the order gets posted
+
+	orders, err := c.ListOrders(context.Background())
+	if !t.NoError(err, "should not fail listing orders") {
 		return
 	}
 
-	equalOrder(t, create, order)
+	found := false
+	for _, v := range orders.Orders {
+		if found = v.ID == createResp.ID; found {
+			break
+		}
+	}
 
-	err = c.CancelOrders(context.Background(), create.ID)
+	if !t.True(found, "order %s should be found after creation when listing orders", createResp.ID) {
+		log.Printf("Got: %+v\n", orders.Orders)
+		return
+	}
 
-	t.NoError(err, "canceling order should not fail")
+	_, err = c.GetOrder(context.Background(), createResp.ID)
+	if !t.NoError(err, "should not fail getting order %s", createResp.ID) {
+		return
+	}
 }

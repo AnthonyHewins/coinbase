@@ -3,6 +3,7 @@ package coinbase
 import (
 	"context"
 	"errors"
+	"net/http"
 )
 
 type cancelResponse struct {
@@ -33,7 +34,7 @@ func (c *Client) CancelOrders(ctx context.Context, ids ...string) error {
 	}
 
 	var r cancelWrapper
-	_, err := c.request(ctx, "DELETE", "/orders/batch_cancel", map[string][]string{
+	_, err := c.request(ctx, http.MethodPost, "/orders/batch_cancel", map[string][]string{
 		"order_ids": ids,
 	}, &r)
 

@@ -7,11 +7,14 @@ import (
 	"time"
 )
 
-const mockPK = `-----BEGIN EC PRIVATE KEY-----
+const (
+	mockKey = "organizations/{org_id}/apiKeys/{key_id}"
+	mockPK  = `-----BEGIN EC PRIVATE KEY-----
 MHcCAQEEIAh5qA3rmqQQuu0vbKV/+zouz/y/Iy2pLpIcWUSyImSwoAoGCCqGSM49
 AwEHoUQDQgAEYD54V/vp+54P9DXarYqx4MPcm+HKRIQzNasYSoRQHQ/6S6Ps8tpM
 cT+KvIIC8W/e9k0W7Cm72M1P9jU7SLf/vg==
 -----END EC PRIVATE KEY-----`
+)
 
 type testserver struct {
 	c      *Client
@@ -29,13 +32,10 @@ func newTestserver(status int, mock any) *testserver {
 		w.Write(buf)
 	}))
 
-	return &testserver{
-		c: &Client{
-			baseURL:    s.URL,
-			httpClient: &http.Client{Timeout: time.Second},
-			keyName:    "key",
-			keySecret:  mockPK,
-		},
-		server: s,
+	c, err := NewClient(s.URL, mockKey, mockPK, &http.Client{Timeout: time.Second})
+	if err != nil {
+		panic(err)
 	}
+
+	return &testserver{c: c, server: s}
 }

@@ -24,10 +24,8 @@ type Client struct {
 	baseURL    string
 	httpClient *http.Client
 
-	keyName   string
-	keySecret string
-
-	signer jose.Signer
+	keyName string
+	signer  jose.Signer
 }
 
 func parsePK(keySecret string) (*ecdsa.PrivateKey, error) {
