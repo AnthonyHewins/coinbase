@@ -14,8 +14,7 @@ type Cursor struct {
 	HasMore    bool
 }
 
-func NewCursor(client *Client, method, url string,
-	paginationParams *PaginationParams) *Cursor {
+func NewCursor(client *Client, method, url string, paginationParams *PaginationParams) *Cursor {
 	return &Cursor{
 		Client:     client,
 		Method:     method,

@@ -10,7 +10,10 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strings"
+
+	"gopkg.in/go-jose/go-jose.v2"
 )
 
 const DefaultProdURL = "https://api.coinbase.com/api/v3/brokerage"
@@ -22,7 +25,7 @@ type Client struct {
 	httpClient *http.Client
 
 	keyName string
-	key     *ecdsa.PrivateKey
+	signer  jose.Signer
 }
 
 func parsePK(keySecret string) (*ecdsa.PrivateKey, error) {
@@ -44,6 +47,7 @@ func NewClient(baseURL, keyName, keySecret string, httpClient *http.Client) (*Cl
 	if err != nil {
 		return nil, err
 	}
+
 	return NewClientWithPrivateKey(baseURL, keyName, key, httpClient)
 }
 
@@ -55,11 +59,19 @@ func NewClientWithPrivateKey(baseURL, keyName string, privateKey *ecdsa.PrivateK
 		return nil, fmt.Errorf("private key missing for coinbase client")
 	}
 
-	keynameParts := strings.Split(keyName, "/")
-	if len(keynameParts) != 4 || keynameParts[0] != "organizations" || keynameParts[2] != "apiKeys" {
+	if keynameParts := strings.Split(keyName, "/"); len(keynameParts) != 4 ||
+		keynameParts[0] != "organizations" || keynameParts[2] != "apiKeys" {
 		return nil, fmt.Errorf(
 			"keyname supplied is invalid: must follow the format organizations/{keyname}/apiKeys/{keyid}",
 		)
+	}
+
+	sig, err := jose.NewSigner(
+		jose.SigningKey{Algorithm: jose.ES256, Key: privateKey},
+		(&jose.SignerOptions{NonceSource: nonceSource{}}).WithType("JWT").WithHeader("kid", keyName),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed creating coinbase signer: %w", err)
 	}
 
 	if httpClient == nil {
@@ -70,8 +82,27 @@ func NewClientWithPrivateKey(baseURL, keyName string, privateKey *ecdsa.PrivateK
 		baseURL:    baseURL,
 		httpClient: httpClient,
 		keyName:    keyName,
-		key:        privateKey,
+		signer:     sig,
 	}, nil
+}
+
+func (c *Client) get(ctx context.Context, url string, params url.Values, result any) error {
+	jwtStr, err := c.generateToken(http.MethodGet, url)
+	if err != nil {
+		return err
+	}
+
+	if len(params) > 0 {
+		url += "?" + params.Encode()
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.baseURL+url, nil)
+	if err != nil {
+		return err
+	}
+
+	_, err = c.send(req, jwtStr, result)
+	return err
 }
 
 func (c *Client) request(ctx context.Context, method string, url string, params, result interface{}) (res *http.Response, err error) {
@@ -97,11 +128,15 @@ func (c *Client) request(ctx context.Context, method string, url string, params,
 		return res, err
 	}
 
+	return c.send(req, jwtStr, result)
+}
+
+func (c *Client) send(req *http.Request, jwtStr string, result any) (*http.Response, error) {
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Authorization", "Bearer "+jwtStr)
 
-	res, err = c.httpClient.Do(req)
+	res, err := c.httpClient.Do(req)
 	if err != nil {
 		return res, err
 	}
@@ -114,7 +149,7 @@ func (c *Client) request(ctx context.Context, method string, url string, params,
 
 	switch res.StatusCode {
 	case 401:
-		return nil, fmt.Errorf("request was unauthorized (HTTP 401)")
+		return nil, fmt.Errorf("request was unauthorized (HTTP 401). Ensure your IP is whitelisted")
 	case 200:
 		if result != nil {
 			err = json.Unmarshal(buf, result)

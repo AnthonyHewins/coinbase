@@ -2,8 +2,6 @@ package coinbase
 
 import (
 	"context"
-	"fmt"
-	"net/http"
 	"net/url"
 	"time"
 )
@@ -31,8 +29,7 @@ func (c *Client) BidAsk(ctx context.Context, pairs ...string) ([]BidAsk, error) 
 	}
 
 	var w wrapper
-	_, err := c.request(ctx, http.MethodGet, fmt.Sprintf("/best_bid_ask?%s", params.Encode()), nil, &w)
-	if err != nil {
+	if err := c.get(ctx, "/best_bid_ask", params, &w); err != nil {
 		return nil, err
 	}
 

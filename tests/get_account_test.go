@@ -13,7 +13,7 @@ func TestGettingAccounts(mainTest *testing.T) {
 	t := assert.New(mainTest)
 
 	accts, err := c.ListAccounts(context.Background())
-	if !t.Nil(err, "should not error getting an account") {
+	if !t.Nil(err, "should not error getting accounts") {
 		return
 	}
 
