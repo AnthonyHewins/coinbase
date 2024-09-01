@@ -26,7 +26,7 @@ type PortfolioView struct {
 
 type SpotPosition struct {
 	Asset                string  `json:"asset"`
-	AccountUuid          string  `json:"account_uuid"`
+	AccountUUID          string  `json:"account_uuid"`
 	TotalBalanceFiat     float64 `json:"total_balance_fiat"`
 	TotalBalanceCrypto   float64 `json:"total_balance_crypto"`
 	AvailableToTradeFiat float64 `json:"available_to_trade_fiat"`
@@ -37,7 +37,7 @@ type SpotPosition struct {
 	IsCash               bool    `json:"is_cash"`
 }
 
-type Balances struct {
+type TotalBalances struct {
 	TotalBalance      Balance `json:"total_balance"`
 	Futures           Balance `json:"total_futures_balance"`
 	CashEq            Balance `json:"total_cash_equivalent_balance"`
@@ -48,7 +48,7 @@ type Balances struct {
 
 type Portfolio struct {
 	PortfolioView PortfolioView
-	Balances      Balances
+	Balances      TotalBalances
 	SpotPositions []SpotPosition
 	Perpetuals    []PerpetualPosition
 	Futures       []FuturePosition
@@ -71,7 +71,7 @@ func (c *Client) GetPortfolio(ctx context.Context, id uuid.UUID) (*Portfolio, er
 	type wrapper struct {
 		Breakdown struct {
 			View      PortfolioView       `json:"portfolio"`
-			Balances  Balances            `json:"portfolio_balances"`
+			Balances  TotalBalances       `json:"portfolio_balances"`
 			Positions []SpotPosition      `json:"spot_positions"`
 			Futures   []FuturePosition    `json:"futures_positions"`
 			Perps     []PerpetualPosition `json:"perp_positions"`

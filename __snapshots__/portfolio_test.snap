@@ -1,0 +1,19 @@
+
+[TestSpotJSON/coinbase.SpotPosition - 1]
+{
+    "asset": "asset",
+    "account_uuid": "uuid",
+    "total_balance_fiat": 1,
+    "total_balance_crypto": 2,
+    "available_to_trade_fiat": 3,
+    "allocation": 4,
+    "one_day_change": 5,
+    "cost_basis": {
+    "value": "1",
+    "currency": "2"
+    },
+    "asset_img_url": "asdin",
+    "is_cash": true
+    }
+
+---
