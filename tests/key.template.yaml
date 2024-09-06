@@ -5,3 +5,6 @@ key: ""
 
 # the key secret. Should be an EC private key
 secret: ""
+
+# a portfolio the key has access to
+portfolio: ""
