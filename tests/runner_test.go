@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/AnthonyHewins/coinbase"
+	"github.com/google/uuid"
 	"gopkg.in/yaml.v3"
 )
 
@@ -17,8 +18,9 @@ var singleton config
 var riskyMode = false
 
 type config struct {
-	Key    string `yaml:"key"`
-	Secret string `yaml:"secret"`
+	Key       string    `yaml:"key"`
+	Secret    string    `yaml:"secret"`
+	Portfolio uuid.UUID `yaml:"portfolio"`
 }
 
 func testClient() *coinbase.Client {
@@ -61,6 +63,10 @@ func TestMain(m *testing.M) {
 
 	if c.Secret == "" {
 		log.Fatalf("missing coinbase key secret in your config: was the empty string")
+	}
+
+	if c.Portfolio == uuid.Nil {
+		log.Fatalf("missing coinbase portfolio")
 	}
 
 	singleton = c

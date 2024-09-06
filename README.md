@@ -1,7 +1,8 @@
 Go Coinbase Pro [![GoDoc](http://img.shields.io/badge/godoc-reference-blue.svg)](https://pkg.go.dev/github.com/AnthonyHewins/coinbase)
 ========
 
-v3 [CoinBase Pro](https://pro.coinbase.com) API client fork
+v3 [CoinBase Pro](https://pro.coinbase.com) API client fork, though it has basically zero
+resemblance to the origin
 
 - [Go Coinbase Pro ](#go-coinbase-pro-)
   - [Go get](#go-get)
@@ -10,7 +11,6 @@ v3 [CoinBase Pro](https://pro.coinbase.com) API client fork
     - [Create order](#create-order)
       - [Cancel order(s)](#cancel-orders)
       - [List orders](#list-orders)
-    - [Websockets](#websockets)
 
 ## Go get
 

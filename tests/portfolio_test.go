@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPortfolio(mainTest *testing.T) {
+func TestListPortfolios(mainTest *testing.T) {
 	c := testClient()
 
 	t := assert.New(mainTest)
@@ -20,9 +20,15 @@ func TestPortfolio(mainTest *testing.T) {
 	if !t.NotEmpty(p, "should have at least one portfolio") {
 		return
 	}
+}
 
-	_, err = c.GetPortfolio(context.Background(), p[0].UUID)
-	if !t.NoError(err, "should not error getting portfolio %s", p[0].UUID) {
+func TestGetPortfolio(mainTest *testing.T) {
+	c := testClient()
+
+	t := assert.New(mainTest)
+
+	_, err := c.GetPortfolio(context.Background(), singleton.Portfolio)
+	if !t.NoError(err, "should not error getting portfolio %s", singleton.Portfolio) {
 		return
 	}
 }
