@@ -21,7 +21,7 @@ func TestOrders(mainTest *testing.T) {
 	t := assert.New(mainTest)
 
 	createResp, err := c.CreateOrder(context.Background(), &coinbase.CreateOrderArgs{
-		ID:        uuid.New().String(),
+		ID:        "integration-test-order-" + uuid.NewString(),
 		ProductID: "BTC-USD",
 		Side:      coinbase.SideBuy,
 		Config: &coinbase.LimitOrderGTD{
@@ -65,6 +65,26 @@ func TestOrders(mainTest *testing.T) {
 
 	_, err = c.GetOrder(context.Background(), createResp.ID)
 	if !t.NoError(err, "should not fail getting order %s", createResp.ID) {
+		return
+	}
+}
+
+func TestOrderFailure(tt *testing.T) {
+	c := testClient()
+	t := assert.New(tt)
+
+	_, err := c.CreateOrder(context.Background(), &coinbase.CreateOrderArgs{
+		ID:        "integration-test-order-" + uuid.NewString(),
+		ProductID: "BTC-USD",
+		Side:      coinbase.SideBuy,
+		Config: &coinbase.LimitOrderGTD{
+			BaseSize:   "0",
+			LimitPrice: "0.01",
+			EndTime:    time.Now().Add(time.Second),
+		},
+	})
+
+	if t.EqualError(err, "200 UNSUPPORTED_ORDER_CONFIGURATION: PREVIEW_INVALID_ORDER_CONFIG", "should not error creating order") {
 		return
 	}
 }

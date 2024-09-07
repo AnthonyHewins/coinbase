@@ -158,18 +158,14 @@ func (c *Client) send(req *http.Request, jwtStr string, result any) (*http.Respo
 		return res, err
 	}
 
-	if res.StatusCode != 200 {
-		coinbaseError := Error{}
-		if err := json.Unmarshal(buf, &coinbaseError); err != nil {
-			return res, &UnmarshalErr{
-				Err:      err,
-				Buf:      string(buf),
-				RespCode: res.StatusCode,
-			}
+	coinbaseError := Error{}
+	if err := json.Unmarshal(buf, &coinbaseError); err != nil {
+		return res, &UnmarshalErr{
+			Err:      err,
+			Buf:      string(buf),
+			RespCode: res.StatusCode,
 		}
-
-		return res, coinbaseError
 	}
 
-	return res, nil
+	return res, &coinbaseError
 }
