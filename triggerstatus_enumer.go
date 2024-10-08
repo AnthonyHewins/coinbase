@@ -8,11 +8,11 @@ import (
 	"strings"
 )
 
-const _TriggerStatusName = "UNKNOWN_TRIGGER_STATUSINVALID_ORDER_TYPEINVALID_STOP_PENDINGINVALID_STOP_TRIGGERED"
+const _TriggerStatusName = "UNKNOWN_TRIGGER_STATUSINVALID_ORDER_TYPESTOP_PENDINGSTOP_TRIGGERED"
 
-var _TriggerStatusIndex = [...]uint8{0, 22, 40, 60, 82}
+var _TriggerStatusIndex = [...]uint8{0, 22, 40, 52, 66}
 
-const _TriggerStatusLowerName = "unknown_trigger_statusinvalid_order_typeinvalid_stop_pendinginvalid_stop_triggered"
+const _TriggerStatusLowerName = "unknown_trigger_statusinvalid_order_typestop_pendingstop_triggered"
 
 func (i TriggerStatus) String() string {
 	if i >= TriggerStatus(len(_TriggerStatusIndex)-1) {
@@ -27,28 +27,28 @@ func _TriggerStatusNoOp() {
 	var x [1]struct{}
 	_ = x[UnknownTriggerStatus-(0)]
 	_ = x[TriggerStatusInvalidOrderType-(1)]
-	_ = x[TriggerStatusInvalidStopPending-(2)]
-	_ = x[TriggerStatusInvalidStopTriggered-(3)]
+	_ = x[TriggerStatusStopPending-(2)]
+	_ = x[TriggerStatusStopTriggered-(3)]
 }
 
-var _TriggerStatusValues = []TriggerStatus{UnknownTriggerStatus, TriggerStatusInvalidOrderType, TriggerStatusInvalidStopPending, TriggerStatusInvalidStopTriggered}
+var _TriggerStatusValues = []TriggerStatus{UnknownTriggerStatus, TriggerStatusInvalidOrderType, TriggerStatusStopPending, TriggerStatusStopTriggered}
 
 var _TriggerStatusNameToValueMap = map[string]TriggerStatus{
 	_TriggerStatusName[0:22]:       UnknownTriggerStatus,
 	_TriggerStatusLowerName[0:22]:  UnknownTriggerStatus,
 	_TriggerStatusName[22:40]:      TriggerStatusInvalidOrderType,
 	_TriggerStatusLowerName[22:40]: TriggerStatusInvalidOrderType,
-	_TriggerStatusName[40:60]:      TriggerStatusInvalidStopPending,
-	_TriggerStatusLowerName[40:60]: TriggerStatusInvalidStopPending,
-	_TriggerStatusName[60:82]:      TriggerStatusInvalidStopTriggered,
-	_TriggerStatusLowerName[60:82]: TriggerStatusInvalidStopTriggered,
+	_TriggerStatusName[40:52]:      TriggerStatusStopPending,
+	_TriggerStatusLowerName[40:52]: TriggerStatusStopPending,
+	_TriggerStatusName[52:66]:      TriggerStatusStopTriggered,
+	_TriggerStatusLowerName[52:66]: TriggerStatusStopTriggered,
 }
 
 var _TriggerStatusNames = []string{
 	_TriggerStatusName[0:22],
 	_TriggerStatusName[22:40],
-	_TriggerStatusName[40:60],
-	_TriggerStatusName[60:82],
+	_TriggerStatusName[40:52],
+	_TriggerStatusName[52:66],
 }
 
 // TriggerStatusString retrieves an enum value from the enum constants string name.

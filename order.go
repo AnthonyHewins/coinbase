@@ -91,8 +91,8 @@ type TriggerStatus byte
 const (
 	UnknownTriggerStatus TriggerStatus = iota
 	TriggerStatusInvalidOrderType
-	TriggerStatusInvalidStopPending
-	TriggerStatusInvalidStopTriggered
+	TriggerStatusStopPending
+	TriggerStatusStopTriggered
 )
 
 //go:generate enumer -type RejectReason -transform snake_upper -json
