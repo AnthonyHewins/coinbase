@@ -2,19 +2,21 @@ package coinbase
 
 import (
 	"fmt"
+
+	"github.com/shopspring/decimal"
 )
 
 type Fill struct {
-	TradeID   int    `json:"trade_id,int"`
-	ProductID string `json:"product_id"`
-	Price     string `json:"price"`
-	Size      string `json:"size"`
-	FillID    string `json:"order_id"`
-	CreatedAt Time   `json:"created_at,string"`
-	Fee       string `json:"fee"`
-	Settled   bool   `json:"settled"`
-	Side      string `json:"side"`
-	Liquidity string `json:"liquidity"`
+	TradeID   int             `json:"trade_id"`
+	ProductID string          `json:"product_id"`
+	Price     decimal.Decimal `json:"price"`
+	Size      string          `json:"size"`
+	FillID    string          `json:"order_id"`
+	CreatedAt Time            `json:"created_at"`
+	Fee       string          `json:"fee"`
+	Settled   bool            `json:"settled"`
+	Side      string          `json:"side"`
+	Liquidity string          `json:"liquidity"`
 }
 
 type ListFillsParams struct {

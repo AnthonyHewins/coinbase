@@ -4,11 +4,13 @@ import (
 	"context"
 	"net/url"
 	"time"
+
+	"github.com/shopspring/decimal"
 )
 
 type OrderBookEntry struct {
-	Price string `json:"price"`
-	Size  string `json:"size"`
+	Price decimal.Decimal `json:"price"`
+	Size  string          `json:"size"`
 }
 
 type BidAsk struct {
