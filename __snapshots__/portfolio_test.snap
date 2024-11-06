@@ -9,8 +9,8 @@
     "allocation": 4,
     "one_day_change": 5,
     "cost_basis": {
-    "value": "1",
-    "currency": "2"
+    "currency": "2",
+    "value": "1"
     },
     "asset_img_url": "asdin",
     "is_cash": true

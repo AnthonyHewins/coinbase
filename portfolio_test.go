@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/gkampitakis/go-snaps/snaps"
+	"github.com/shopspring/decimal"
 )
 
 func TestSpotJSON(mainTest *testing.T) {
@@ -23,7 +24,7 @@ func TestSpotJSON(mainTest *testing.T) {
 				Allocation:           4,
 				OneDayChange:         5,
 				Cost_basis: Balance{
-					Value:    "1",
+					Value:    decimal.NewFromInt(1),
 					Currency: "2",
 				},
 				AssetImgUrl: "asdin",

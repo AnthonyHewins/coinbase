@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 )
 
 //go:generate enumer -type AcctType -transform snake_upper -json
@@ -20,8 +21,8 @@ const (
 )
 
 type Balance struct {
-	Value    string `json:"value"`
-	Currency string `json:"currency"`
+	Currency string          `json:"currency"`
+	Value    decimal.Decimal `json:"value"`
 }
 
 type Account struct {
