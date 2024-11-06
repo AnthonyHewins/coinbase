@@ -66,7 +66,7 @@ func TestMain(m *testing.M) {
 	}
 
 	if c.Portfolio == uuid.Nil {
-		log.Fatalf("missing coinbase portfolio")
+		log.Fatalf("missing coinbase portfolio ID")
 	}
 
 	singleton = c

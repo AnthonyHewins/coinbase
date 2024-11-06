@@ -1,10 +1,14 @@
 package coinbase
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/shopspring/decimal"
+)
 
 func TestMarketOrderJSON(t *testing.T) {
 	marshalTest(t, &MarketOrder{
-		QuoteSize: "1234",
-		BaseSize:  "3423.5324",
+		QuoteSize: decimal.NewFromFloat(1234),
+		BaseSize:  decimal.NewFromFloat(3423.5324),
 	})
 }

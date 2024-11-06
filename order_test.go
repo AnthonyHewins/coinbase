@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -70,8 +71,8 @@ func TestUnmarshalOrder(mainTest *testing.T) {
 				ProductID: "BTC-USD",
 				User:      "e0b87645-7245-5705-8f29-6550318cda60",
 				Config: &LimitOrderGTD{
-					BaseSize:   "0.00000001",
-					LimitPrice: "0.01",
+					BaseSize:   decimal.NewFromFloat(0.00000001),
+					LimitPrice: decimal.NewFromFloat(0.01),
 					EndTime:    mustParse("2024-08-30T13:07:40.823884203Z"),
 				},
 				Side:                  SideBuy,

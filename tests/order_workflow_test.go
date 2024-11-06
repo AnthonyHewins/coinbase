@@ -8,6 +8,7 @@ import (
 
 	"github.com/AnthonyHewins/coinbase"
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -24,10 +25,12 @@ func TestOrders(mainTest *testing.T) {
 		ID:        "integration-test-order-" + uuid.NewString(),
 		ProductID: "BTC-USD",
 		Side:      coinbase.SideBuy,
-		Config: &coinbase.LimitOrderGTD{
-			BaseSize:   "0.00000001",
-			LimitPrice: "0.01",
+		Config: &coinbase.StopLimitOrderGTD{
+			BaseSize:   decimal.NewFromFloat(0.00000001),
+			LimitPrice: decimal.NewFromFloat(0.01),
+			Stop:       decimal.NewFromFloat(0.01),
 			EndTime:    time.Now().Add(time.Second * 15),
+			Side:       coinbase.SideBuy,
 		},
 	})
 
@@ -78,8 +81,8 @@ func TestOrderFailure(tt *testing.T) {
 		ProductID: "BTC-USD",
 		Side:      coinbase.SideBuy,
 		Config: &coinbase.LimitOrderGTD{
-			BaseSize:   "0",
-			LimitPrice: "0.01",
+			BaseSize:   decimal.NewFromFloat(0),
+			LimitPrice: decimal.NewFromFloat(0.01),
 			EndTime:    time.Now().Add(time.Second),
 		},
 	})

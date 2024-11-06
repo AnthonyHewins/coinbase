@@ -1,11 +1,15 @@
 package coinbase
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/shopspring/decimal"
+)
 
 func TestTriggerBracketOrderGTCJson(t *testing.T) {
 	marshalTest(t, &TriggerBracketOrderGTC{
-		BaseSize:         "32425.43",
-		LimitPrice:       "3254.54",
-		StopTriggerPrice: "123.541",
+		BaseSize:         decimal.NewFromFloat(32425.43),
+		LimitPrice:       decimal.NewFromFloat(3254.54),
+		StopTriggerPrice: decimal.NewFromFloat(123.541),
 	})
 }

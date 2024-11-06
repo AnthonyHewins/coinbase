@@ -1,10 +1,14 @@
 package coinbase
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/shopspring/decimal"
+)
 
 func TestLimitOrderIOCJson(t *testing.T) {
 	marshalTest(t, &LimitOrderIOC{
-		BaseSize:   "19203",
-		LimitPrice: "43254",
+		BaseSize:   decimal.NewFromFloat(19203),
+		LimitPrice: decimal.NewFromFloat(43254),
 	})
 }

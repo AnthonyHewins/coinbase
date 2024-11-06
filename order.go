@@ -39,14 +39,14 @@ const (
 	SideSell
 )
 
-func (s Side) toStopDirectionStr() string {
+func (s Side) toStopDirection() StopDirection {
 	switch s {
 	case SideBuy:
-		return "STOP_DIRECTION_STOP_UP"
+		return StopDirectionStopUp
 	case SideSell:
-		return "STOP_DIRECTION_STOP_DOWN"
+		return StopDirectionStopDown
 	default:
-		return ""
+		return StopDirectionUnspecified
 	}
 }
 

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gkampitakis/go-snaps/snaps"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -36,29 +37,29 @@ func TestDiscoverConfig(mainTest *testing.T) {
 	}{
 		{
 			orderType: "MARKET",
-			c:         &MarketOrder{QuoteSize: "123", BaseSize: "123"},
+			c:         &MarketOrder{QuoteSize: decimal.NewFromFloat(123), BaseSize: decimal.NewFromFloat(123)},
 		},
 		{
 			orderType: "LIMIT",
-			c:         &LimitOrderIOC{BaseSize: "1234", LimitPrice: "1234"},
+			c:         &LimitOrderIOC{BaseSize: decimal.NewFromFloat(1234), LimitPrice: decimal.NewFromFloat(1234)},
 		},
 		{
 			orderType: "LIMIT",
-			c:         &LimitOrderFOK{BaseSize: "1234", LimitPrice: "1234"},
+			c:         &LimitOrderFOK{BaseSize: decimal.NewFromFloat(1234), LimitPrice: decimal.NewFromFloat(1234)},
 		},
 		{
 			orderType: "LIMIT",
 			c: &LimitOrderGTC{
-				BaseSize:   "1234",
-				LimitPrice: "1234",
+				BaseSize:   decimal.NewFromFloat(1234),
+				LimitPrice: decimal.NewFromFloat(1234),
 				PostOnly:   true,
 			},
 		},
 		{
 			orderType: "LIMIT",
 			c: &LimitOrderGTD{
-				BaseSize:   "1234",
-				LimitPrice: "1234",
+				BaseSize:   decimal.NewFromFloat(1234),
+				LimitPrice: decimal.NewFromFloat(1234),
 				EndTime:    end,
 				PostOnly:   true,
 			},
@@ -66,18 +67,18 @@ func TestDiscoverConfig(mainTest *testing.T) {
 		{
 			orderType: "STOP",
 			c: &StopLimitOrderGTC{
-				BaseSize:   "82103",
-				LimitPrice: "34254",
-				Stop:       "324",
+				BaseSize:   decimal.NewFromFloat(82103),
+				LimitPrice: decimal.NewFromFloat(34254),
+				Stop:       decimal.NewFromFloat(324),
 				Side:       SideBuy,
 			},
 		},
 		{
 			orderType: "STOP",
 			c: &StopLimitOrderGTD{
-				BaseSize:   "82103",
-				LimitPrice: "34254",
-				Stop:       "324",
+				BaseSize:   decimal.NewFromFloat(82103),
+				LimitPrice: decimal.NewFromFloat(34254),
+				Stop:       decimal.NewFromFloat(324),
 				EndTime:    end,
 				Side:       SideBuy,
 			},
@@ -85,18 +86,18 @@ func TestDiscoverConfig(mainTest *testing.T) {
 		{
 			orderType: "BRACKET",
 			c: &TriggerBracketOrderGTC{
-				BaseSize:         "2343",
-				LimitPrice:       "5544",
-				StopTriggerPrice: "123",
+				BaseSize:         decimal.NewFromFloat(2343),
+				LimitPrice:       decimal.NewFromFloat(5544),
+				StopTriggerPrice: decimal.NewFromFloat(123),
 			},
 		},
 		{
 			orderType: "BRACKET",
 			c: &TriggerBracketOrderGTD{
-				BaseSize:         "2343",
-				LimitPrice:       "5544",
+				BaseSize:         decimal.NewFromFloat(2343),
+				LimitPrice:       decimal.NewFromFloat(5544),
 				EndTime:          end,
-				StopTriggerPrice: "123",
+				StopTriggerPrice: decimal.NewFromFloat(123),
 			},
 		},
 	}

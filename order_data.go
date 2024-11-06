@@ -4,6 +4,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"time"
+
+	"github.com/shopspring/decimal"
+)
+
+//go:generate enumer -type StopDirection -transform snake-upper -json
+type StopDirection byte
+
+const (
+	StopDirectionUnspecified StopDirection = iota
+	StopDirectionStopUp                    // buy side
+	StopDirectionStopDown                  // sell side
 )
 
 // wrapper type to encapsulate JSON fields the end developer doesn't
@@ -11,31 +22,66 @@ import (
 type orderData struct {
 	// The amount of the second Asset in the Trading Pair. For example, on the
 	// BTC/USD Order Book, USD is the Quote Asset.
-	QuoteSize string `json:"quote_size,omitempty"`
+	QuoteSize decimal.Decimal `json:"quote_size,omitempty"`
 
 	// The amount of the first Asset in the Trading Pair. For example, on the
 	// BTC-USD Order Book, BTC is the Base Asset.
-	BaseSize string `json:"base_size,omitempty"`
+	BaseSize decimal.Decimal `json:"base_size,omitempty"`
 
 	// The specified price, or better, that the Order should be executed at. A
 	// Buy Order will execute at or lower than the limit price. A Sell Order
 	// will execute at or higher than the limit price.
-	LimitPrice       string     `json:"limit_price,omitempty"`
-	PostOnly         bool       `json:"post_only,omitempty"`
-	End              *time.Time `json:"end_time,omitempty"`
-	Stop             string     `json:"stop_price,omitempty"`
-	Side             string     `json:"stop_direction,omitempty"`
-	StopTriggerPrice string     `json:"stop_trigger_price,omitempty"`
+	LimitPrice       decimal.Decimal `json:"limit_price,omitempty"`
+	PostOnly         bool            `json:"post_only,omitempty"`
+	End              *time.Time      `json:"end_time,omitempty"`
+	Stop             decimal.Decimal `json:"stop_price,omitempty"`
+	StopDirection    StopDirection   `json:"stop_direction,omitempty"`
+	StopTriggerPrice decimal.Decimal `json:"stop_trigger_price,omitempty"`
 }
 
-func (o *orderData) stopSide() (Side, error) {
-	switch x := o.Side; x {
-	case "STOP_DIRECTION_STOP_UP":
-		return SideBuy, nil
-	case "STOP_DIRECTION_STOP_DOWN":
-		return SideSell, nil
+func (o *orderData) MarshalJSON() ([]byte, error) {
+	m := map[string]any{}
+
+	type pairs struct {
+		name  string
+		value decimal.Decimal
+	}
+
+	for _, v := range []pairs{
+		{"quote_size", o.QuoteSize},
+		{"base_size", o.BaseSize},
+		{"limit_price", o.LimitPrice},
+		{"stop_price", o.Stop},
+		{"stop_trigger_price", o.StopTriggerPrice},
+	} {
+		if !v.value.IsZero() {
+			m[v.name] = v.value
+		}
+	}
+
+	if o.PostOnly {
+		m["post_only"] = true
+	}
+
+	if o.End != nil {
+		m["end_time"] = *o.End
+	}
+
+	if o.StopDirection != StopDirectionUnspecified {
+		m["stop_direction"] = o.StopDirection
+	}
+
+	return json.Marshal(m)
+}
+
+func (o *orderData) stopSide() Side {
+	switch x := o.StopDirection; x {
+	case StopDirectionStopUp:
+		return SideBuy
+	case StopDirectionStopDown:
+		return SideSell
 	default:
-		return SideUnspecified, fmt.Errorf("invalid stop direction: %s", x)
+		return SideUnspecified
 	}
 }
 
@@ -62,7 +108,7 @@ func discoverConfig(orderType string, b json.RawMessage) (OrderConfig, error) {
 		return nil, fmt.Errorf("invalid order config, expected object (%w): %s", err, b)
 	}
 
-	var data orderData
+	var data *orderData
 	switch orderType {
 	case "LIMIT":
 		for k, v := range m {
@@ -98,12 +144,7 @@ func discoverConfig(orderType string, b json.RawMessage) (OrderConfig, error) {
 				return nil, fmt.Errorf("failed unmarshal of stop limit order (type %s): %w", k, err)
 			}
 
-			side, err := data.stopSide()
-			if err != nil {
-				return nil, fmt.Errorf("failed unmarshal of stop direction (type %s): %w", data.Side, err)
-			}
-
-			switch k {
+			switch side := data.stopSide(); k {
 			case "stop_limit_stop_limit_gtc":
 				return &StopLimitOrderGTC{
 					BaseSize:   data.BaseSize,

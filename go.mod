@@ -9,6 +9,7 @@ require (
 
 require (
 	github.com/google/go-cmp v0.6.0 // indirect
+	github.com/shopspring/decimal v1.4.0 // indirect
 	golang.org/x/crypto v0.26.0 // indirect
 )
 

@@ -1,11 +1,15 @@
 package coinbase
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/shopspring/decimal"
+)
 
 func TestLimitOrderGTCJSON(t *testing.T) {
 	marshalTest(t, &LimitOrderGTC{
-		BaseSize:   "214532",
-		LimitPrice: "4325454",
+		BaseSize:   decimal.NewFromFloat(214532),
+		LimitPrice: decimal.NewFromFloat(4325454),
 		PostOnly:   true,
 	})
 }
