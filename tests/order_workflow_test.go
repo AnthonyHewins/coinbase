@@ -25,12 +25,10 @@ func TestOrders(mainTest *testing.T) {
 		ID:        "integration-test-order-" + uuid.NewString(),
 		ProductID: "BTC-USD",
 		Side:      coinbase.SideBuy,
-		Config: &coinbase.StopLimitOrderGTD{
+		Config: &coinbase.LimitOrderGTD{
 			BaseSize:   decimal.NewFromFloat(0.00000001),
 			LimitPrice: decimal.NewFromFloat(0.01),
-			Stop:       decimal.NewFromFloat(0.01),
 			EndTime:    time.Now().Add(time.Second * 15),
-			Side:       coinbase.SideBuy,
 		},
 	})
 
